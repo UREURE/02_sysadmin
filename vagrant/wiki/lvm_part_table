@@ -1,0 +1,6 @@
+label: dos
+label-id: 0xb9950184
+device: /dev/sdb
+unit: sectors
+
+/dev/sdb1 : start=        2048, size=     2095104, type=8e

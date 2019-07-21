@@ -1,0 +1,71 @@
+Vagrant.configure("2") do |config|
+  config.vm.define "debelk" do |debelk|
+    debelk.vm.provision "shell", path: "elk/install_elk.sh"
+    debelk.vm.box = "debian/stretch64"
+    debelk.vm.hostname = "debelk"
+    debelk.vm.box_check_update = false
+    debelk.vm.provider "virtualbox" do |vb|
+      vb.name = "debelk"
+      vb.memory = "2048"
+      vb.customize ["modifyvm", :id, "--cableconnected1", "on"]
+      file_to_disk1 = "debelk_xtrahd1.vmdk"
+      file_to_disk2 = "debelk_xtrahd2.vmdk"
+      file_to_disk3 = "debelk_xtrahd3.vmdk"
+      file_to_disk4 = "debelk_xtrahd4.vmdk"
+      unless File.exist?(file_to_disk1)
+          vb.customize [ "createmedium", "disk", "--filename", "debelk_xtrahd1.vmdk", "--format", "vmdk", "--size", 1024 * 1 ]
+      end
+      unless File.exist?(file_to_disk2)
+          vb.customize [ "createmedium", "disk", "--filename", "debelk_xtrahd2.vmdk", "--format", "vmdk", "--size", 1024 * 1 ]
+      end
+      unless File.exist?(file_to_disk3)
+          vb.customize [ "createmedium", "disk", "--filename", "debelk_xtrahd3.vmdk", "--format", "vmdk", "--size", 1024 * 1 ]
+      end
+      unless File.exist?(file_to_disk4)
+          vb.customize [ "createmedium", "disk", "--filename", "debelk_xtrahd4.vmdk", "--format", "vmdk", "--size", 1024 * 1 ]
+      end
+      vb.customize [ "storageattach", "debelk" , "--storagectl", "SATA Controller", "--port", "1", "--device", "0", "--type", "hdd", "--medium", file_to_disk1]
+      vb.customize [ "storageattach", "debelk" , "--storagectl", "SATA Controller", "--port", "2", "--device", "0", "--type", "hdd", "--medium", file_to_disk2]
+      vb.customize [ "storageattach", "debelk" , "--storagectl", "SATA Controller", "--port", "3", "--device", "0", "--type", "hdd", "--medium", file_to_disk3]
+      vb.customize [ "storageattach", "debelk" , "--storagectl", "SATA Controller", "--port", "4", "--device", "0", "--type", "hdd", "--medium", file_to_disk4]
+    end
+    debelk.vm.network "forwarded_port", guest: 22, host: 2222, host_ip: "127.0.0.1", id: 'ssh'
+    debelk.vm.network "forwarded_port", guest: 80, host: 8001
+    debelk.vm.network "private_network", ip: "10.0.0.10", nic_type: "virtio", virtualbox__intnet: "elk_wiki"
+  end
+
+  config.vm.define "debwiki" do |debwiki|
+    debwiki.vm.provision "shell", path: "wiki/install_wiki.sh"
+    debwiki.vm.box = "debian/stretch64"
+    debwiki.vm.hostname = "debwiki"
+    debwiki.vm.box_check_update = false
+    debwiki.vm.provider "virtualbox" do |vb|
+      vb.name = "debwiki"
+      vb.memory = "1024"
+      vb.customize ["modifyvm", :id, "--cableconnected1", "on"]
+      file_to_disk1 = "debwiki_xtrahd1.vmdk"
+      file_to_disk2 = "debwiki_xtrahd2.vmdk"
+      file_to_disk3 = "debwiki_xtrahd3.vmdk"
+      file_to_disk4 = "debwiki_xtrahd4.vmdk"
+      unless File.exist?(file_to_disk1)
+          vb.customize [ "createmedium", "disk", "--filename", "debwiki_xtrahd1.vmdk", "--format", "vmdk", "--size", 1024 * 1 ]
+      end
+      unless File.exist?(file_to_disk2)
+          vb.customize [ "createmedium", "disk", "--filename", "debwiki_xtrahd2.vmdk", "--format", "vmdk", "--size", 1024 * 1 ]
+      end
+      unless File.exist?(file_to_disk3)
+          vb.customize [ "createmedium", "disk", "--filename", "debwiki_xtrahd3.vmdk", "--format", "vmdk", "--size", 1024 * 1 ]
+      end
+      unless File.exist?(file_to_disk4)
+          vb.customize [ "createmedium", "disk", "--filename", "debwiki_xtrahd4.vmdk", "--format", "vmdk", "--size", 1024 * 1 ]
+      end
+      vb.customize [ "storageattach", "debwiki" , "--storagectl", "SATA Controller", "--port", "1", "--device", "0", "--type", "hdd", "--medium", file_to_disk1]
+      vb.customize [ "storageattach", "debwiki" , "--storagectl", "SATA Controller", "--port", "2", "--device", "0", "--type", "hdd", "--medium", file_to_disk2]
+      vb.customize [ "storageattach", "debwiki" , "--storagectl", "SATA Controller", "--port", "3", "--device", "0", "--type", "hdd", "--medium", file_to_disk3]
+      vb.customize [ "storageattach", "debwiki" , "--storagectl", "SATA Controller", "--port", "4", "--device", "0", "--type", "hdd", "--medium", file_to_disk4]
+    end
+    debwiki.vm.network "forwarded_port", guest: 22, host: 2200, host_ip: "127.0.0.1", id: 'ssh'
+    debwiki.vm.network "forwarded_port", guest: 80, host: 8000
+    debwiki.vm.network "private_network", ip: "10.0.0.11", nic_type: "virtio", virtualbox__intnet: "elk_wiki"
+  end
+end
